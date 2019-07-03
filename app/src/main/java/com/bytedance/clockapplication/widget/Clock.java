@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
@@ -12,6 +13,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -19,7 +21,6 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 public class Clock extends View {
@@ -27,6 +28,7 @@ public class Clock extends View {
     private final static String TAG = Clock.class.getSimpleName();
 
     private static final int FULL_ANGLE = 360;
+    private static final int START_CLOCK = 1000;
 
     private static final int CUSTOM_ALPHA = 140;
     private static final int FULL_ALPHA = 255;
@@ -130,7 +132,9 @@ public class Clock extends View {
             drawNumbers(canvas);
         }
 
-        postInvalidateDelayed(1000);
+        handler.sendEmptyMessage(START_CLOCK);
+
+//        postInvalidateDelayed(1000);
     }
 
     private void drawDegrees(Canvas canvas) {
@@ -312,5 +316,19 @@ public class Clock extends View {
     public boolean isShowAnalog() {
         return mShowAnalog;
     }
+
+    private Handler handler = new Handler(){
+
+        @Override
+        public void handleMessage(Message message){
+            super.handleMessage(message);
+            switch (message.what){
+                case START_CLOCK:
+                    invalidate();
+                    handler.sendEmptyMessageDelayed(START_CLOCK,1000);
+                    break;
+            }
+        }
+    };
 
 }
